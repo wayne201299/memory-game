@@ -14,3 +14,7 @@
 * 要秀的值
 * 點下去的元素的陣列索引值
 ## 部屬指令
+git add .
+git commit -m "description"
+git push
+npm run deploy

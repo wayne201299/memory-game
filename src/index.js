@@ -62,7 +62,10 @@ class Game extends React.Component {
         }
         // 如果全部都翻完了
         if (this.isFinish(flipArray_tmp)) {
-            alert('All cards are flip!!');
+            let a = window.confirm('厲害!! \n 在一場?');
+            if (a) {
+                this.reset();
+            }
         } else if (!fstVal_tmp) {
             // 如果是第一次翻，要把位置記錄下來
             fstVal_tmp = currentVal;
@@ -75,7 +78,6 @@ class Game extends React.Component {
             //     // if both card are flipped
             //     // 第一跟第二個值比對成功的話，要留在場上，反之則兩張都蓋起來
             if (fstVal_tmp === currentVal) {
-                console.log('MATCH')
                 this.setState({
                     fstVal: null,
                     pre_pos: null,
@@ -86,9 +88,9 @@ class Game extends React.Component {
                     fstVal: null,
                     pre_pos: null,
                 })
-                console.log(fstVal_tmp)
-                console.log(currentVal)
-                console.log('not match')
+                // 原本想在這直接改卡片狀態的array，但不知道為何會動到state裡的值，研究中...，都已經用tmp的值來改了說
+                // flipArray_tmp[pre_pos_tmp] = false;
+                // flipArray_tmp[i] = false;
                 this.unflipCard(pre_pos_tmp, i);
             }
         }
