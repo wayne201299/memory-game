@@ -25,8 +25,6 @@ class Game extends React.Component {
         this.state = {
             // 第一比對值
             fstVal: null,
-            // 第二比對值
-            secVal: null,
             // 用來記錄第一個翻的牌位置，以便翻第二張牌時可以改前一張牌的狀態
             pre_pos: null,
             // 紀錄所有卡片背後所存的值
@@ -48,49 +46,91 @@ class Game extends React.Component {
         return (<Card
             value={showVal}
             onClick={() => this.handleClick(index)} />);
-
     }
     handleClick(i) {
-        const flipArray_tmp = this.state.flipArray.slice();
+        let flipArray_tmp = this.state.flipArray.slice();
         let fstVal_tmp = this.state.fstVal;
-        let secVal_tmp = this.state.secVal;
         let pre_pos_tmp = this.state.pre_pos;
-        const current = this.state.cardArray[i];
-        // 記錄每張牌是蓋上或翻開
-        console.log(flipArray_tmp);
+        const currentVal = this.state.cardArray[i];
+        // 記錄每張牌是蓋上或翻開，如果翻過的就不做事
         if (!flipArray_tmp[i]) {
             flipArray_tmp[i] = true;
+            this.flipCard(flipArray_tmp);
+            console.log('open')
         } else {
             return;
         }
-        // 如果是第一次翻，要把位置記錄下來
-        if (!fstVal_tmp) {
-            fstVal_tmp = current;
+        // 如果全部都翻完了
+        if (this.isFinish(flipArray_tmp)) {
+            alert('All cards are flip!!');
+        } else if (!fstVal_tmp) {
+            // 如果是第一次翻，要把位置記錄下來
+            fstVal_tmp = currentVal;
             pre_pos_tmp = i;
-        } else {
-            // second time
-            secVal_tmp = current;
-            // 第一跟第二個值比對成功的話，要留在場上，反之則兩張都蓋起來
-            if (fstVal_tmp === secVal_tmp) {
-                // TODO:比對成功要做的事?
-                alert('Match!')
+            this.setState({
+                fstVal: currentVal,
+                pre_pos: pre_pos_tmp,
+            });
+        } else if (flipArray_tmp[pre_pos_tmp] && flipArray_tmp[i]) {
+            //     // if both card are flipped
+            //     // 第一跟第二個值比對成功的話，要留在場上，反之則兩張都蓋起來
+            if (fstVal_tmp === currentVal) {
+                console.log('MATCH')
+                this.setState({
+                    fstVal: null,
+                    pre_pos: null,
+                    flipArray: flipArray_tmp
+                })
             } else {
-                alert('FAIL!')
-                flipArray_tmp[this.state.pre_pos] = false;
-                flipArray_tmp[i] = false;
+                this.setState({
+                    fstVal: null,
+                    pre_pos: null,
+                })
+                console.log(fstVal_tmp)
+                console.log(currentVal)
+                console.log('not match')
+                this.unflipCard(pre_pos_tmp, i);
             }
-            pre_pos_tmp = null;
-            fstVal_tmp = null;
-            secVal_tmp = null;
         }
+    }
 
-        // alert('fst:' + fstVal_tmp + ' ,2nd:' + secVal_tmp + ' ,position:' + pre_pos_tmp)
+    /**
+     * @description 將牌翻開
+     */
+    flipCard(flipArray_tmp) {
         this.setState({
-            fstVal: fstVal_tmp,
-            secVal: secVal_tmp,
-            pre_pos: pre_pos_tmp,
-            cardArray: this.state.cardArray,
             flipArray: flipArray_tmp,
+        })
+    }
+    /**
+ * @description 將牌蓋上
+ */
+    unflipCard(prePos, currenPos) {
+        let tmpArr = this.state.flipArray;
+        tmpArr[prePos] = false;
+        tmpArr[currenPos] = false;
+        setTimeout(() => {
+            this.setState({
+                fstVal: null,
+                pre_pos: null,
+                flipArray: tmpArr,
+            })
+        }, 500)
+    }
+    /**
+ * @description 判斷遊戲是否結束，大家都翻開了
+ */
+    isFinish(flipArray) {
+        let a = flipArray.some(e => e === false);
+        return !a
+    }
+    reset() {
+        this.setState({
+            fstVal: null,
+            secVal: null,
+            pre_pos: null,
+            cardArray: shuffle(cardArray_init.concat(cardArray_init)),
+            flipArray: Array(16).fill(false),
         })
     }
     render() {
@@ -102,15 +142,7 @@ class Game extends React.Component {
                         return this.renderCard(card, index)
                     })}
                 </div>
-                <button className='reset' onClick={() => {
-                    this.setState({
-                        fstVal: null,
-                        secVal: null,
-                        pre_pos: null,
-                        cardArray: shuffle(cardArray_init.concat(cardArray_init)),
-                        flipArray: Array(16).fill(false),
-                    })
-                }}>Reset</button>
+                <button className='reset' onClick={() => this.reset()}>Reset</button>
             </div>
         );
     }
