@@ -14,7 +14,7 @@
 * 要秀的值
 * 點下去的元素的陣列索引值
 ## 部屬指令
-git add .
-git commit -m "description"
-git push
-npm run deploy
+* git add . 對根目錄進行版控
+* git commit -m "description"　commit 並下註解
+* git push 將本機分支推上github
+* npm run deploy 跑package.json內的script指令(這個是跑deploy=>部屬到githubPage 上)
